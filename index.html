@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>STRAW - Portfolio</title>
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --red: #DE1C45;
+      --red2: #ff3b5c;
+      --red-soft: rgba(222,28,69,0.15);
+      --red-glow: rgba(222,28,69,0.25);
+      --glass-bg: rgba(255,255,255,0.10);
+      --glass-bg-hover: rgba(255,255,255,0.16);
+      --glass-border: rgba(255,255,255,0.22);
+      --glass-shine: rgba(255,255,255,0.55);
+      --glass-shadow: rgba(0,0,0,0.25);
+      --text: #ffffff;
+      --text-dim: rgba(255,255,255,0.55);
+      --text-mid: rgba(255,255,255,0.80);
+      --font: 'DM Sans', sans-serif;
+      --font-serif: 'DM Serif Display', serif;
+    }
+
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: #0a0a0f;
+    }
+
+    /* ANIMATED BACKGROUND */
+    .bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 20% 10%, rgba(222,28,69,0.28) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 80%, rgba(120,10,30,0.35) 0%, transparent 55%),
+        linear-gradient(160deg, #120008 0%, #0a0a0f 40%, #0f0510 100%);
+      overflow: hidden;
+    }
+
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(70px);
+      animation: float linear infinite;
+      pointer-events: none;
+    }
+    .orb-1 {
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(222,28,69,0.22), transparent 70%);
+      top: -150px; left: -100px;
+      animation-duration: 18s;
+    }
+    .orb-2 {
+      width: 450px; height: 450px;
+      background: radial-gradient(circle, rgba(180,10,40,0.18), transparent 70%);
+      bottom: -100px; right: 5%;
+      animation-duration: 22s;
+      animation-direction: reverse;
+    }
+    .orb-3 {
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(255,60,90,0.12), transparent 70%);
+      top: 50%; left: 50%;
+      animation-duration: 28s;
+    }
+
+    @keyframes float {
+      0%   { transform: translate(0,0) scale(1); }
+      33%  { transform: translate(40px,-60px) scale(1.05); }
+      66%  { transform: translate(-30px,40px) scale(0.97); }
+      100% { transform: translate(0,0) scale(1); }
+    }
+
+    .page-wrap { position: relative; z-index: 1; }
+
+    /* GLASS */
+    .glass {
+      background: var(--glass-bg);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      box-shadow:
+        0 8px 40px var(--glass-shadow),
+        inset 0 1px 0 var(--glass-shine),
+        inset 0 -1px 0 rgba(255,255,255,0.06),
+        inset 0 0 30px 10px rgba(255,255,255,0.03);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .glass::before {
+      content:'';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.7), transparent);
+      pointer-events: none;
+    }
+
+    .glass::after {
+      content:'';
+      position: absolute;
+      top: 0; left: 0;
+      width: 1px; height: 100%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.6), transparent 50%, rgba(255,255,255,0.15));
+      pointer-events: none;
+    }
+
+    /* NAV */
+    nav {
+      position: fixed;
+      top: 20px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 200;
+      background: rgba(15,5,10,0.55);
+      backdrop-filter: blur(30px) saturate(200%);
+      -webkit-backdrop-filter: blur(30px) saturate(200%);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 50px;
+      box-shadow: 0 4px 30px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.2);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 0.8rem;
+      white-space: nowrap;
+    }
+
+    .nav-logo {
+      font-family: var(--font-serif);
+      font-size: 1.05rem;
+      color: var(--red2);
+      padding: 0.4rem 0.9rem;
+      letter-spacing: 0.05em;
+    }
+
+    .nav-sep { width:1px; height:18px; background:rgba(255,255,255,0.15); }
+
+    .nav-links { display:flex; gap:0.2rem; list-style:none; }
+
+    .nav-links a {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      text-decoration: none;
+      padding: 0.4rem 1rem;
+      border-radius: 30px;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); background: rgba(255,255,255,0.10); }
+    .nav-links a.active { color: var(--text); background: rgba(222,28,69,0.25); }
+
+    /* HERO */
+    #hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 8rem 6vw 4rem;
+    }
+
+    .hero-inner { max-width: 1100px; margin: 0 auto; width: 100%; }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--red2);
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      background: rgba(222,28,69,0.12);
+      border: 1px solid rgba(222,28,69,0.3);
+      border-radius: 50px;
+      padding: 0.38rem 1rem;
+      margin-bottom: 2.2rem;
+      backdrop-filter: blur(10px);
+      animation: fadeUp 0.8s ease both;
+    }
+
+    .eyebrow-dot {
+      width: 6px; height: 6px;
+      background: var(--red2);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--red2);
+      animation: pulse-dot 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse-dot {
+      0%,100%{ opacity:1; transform:scale(1); }
+      50%{ opacity:0.5; transform:scale(0.7); }
+    }
+
+    h1.hero-title {
+      font-family: var(--font-serif);
+      font-size: clamp(4rem, 11vw, 10rem);
+      line-height: 0.95;
+      letter-spacing: -0.02em;
+      margin-bottom: 2rem;
+      animation: fadeUp 0.8s 0.1s ease both;
+    }
+
+    h1.hero-title .accent {
+      background: linear-gradient(135deg, var(--red2) 0%, #ff7090 50%, var(--red) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 1.8vw, 1.2rem);
+      color: var(--text-mid);
+      font-weight: 300;
+      max-width: 500px;
+      line-height: 1.75;
+      margin-bottom: 2.5rem;
+      animation: fadeUp 0.8s 0.2s ease both;
+    }
+
+    .hero-sub strong { color: var(--text); font-weight: 600; }
+
+    .hero-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.7rem;
+      margin-bottom: 3rem;
+      animation: fadeUp 0.8s 0.3s ease both;
+    }
+
+    .pill {
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--text-mid);
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 50px;
+      padding: 0.4rem 1rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .hero-cta {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      animation: fadeUp 0.8s 0.4s ease both;
+    }
+
+    .btn-glass {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font);
+      font-size: 0.9rem;
+      font-weight: 500;
+      text-decoration: none;
+      padding: 0.85rem 1.8rem;
+      border-radius: 50px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--red) 0%, #ff3b5c 100%);
+      color: #fff;
+      box-shadow: 0 4px 20px rgba(222,28,69,0.4), inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(222,28,69,0.55), inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.10);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,0.2);
+      backdrop-filter: blur(12px);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+    }
+
+    .btn-secondary:hover { transform: translateY(-2px); background: rgba(255,255,255,0.15); }
+
+    /* SECTIONS */
+    section { padding: 6rem 6vw; }
+
+    .section-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--red2);
+      margin-bottom: 0.6rem;
+    }
+
+    .section-title {
+      font-family: var(--font-serif);
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      letter-spacing: -0.02em;
+      line-height: 1.05;
+      margin-bottom: 3rem;
+    }
+
+    /* ABOUT */
+    #about { background: rgba(0,0,0,0.15); }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      align-items: start;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .about-card { padding: 2.5rem; }
+
+    .about-text p {
+      font-size: 1rem;
+      font-weight: 300;
+      color: var(--text-mid);
+      line-height: 1.85;
+      margin-bottom: 1.1rem;
+    }
+
+    .about-text p strong { color: var(--text); font-weight: 600; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.2rem;
+    }
+
+    .stat-glass {
+      padding: 1.8rem 1.5rem;
+      text-align: center;
+      transition: transform 0.3s;
+    }
+
+    .stat-glass:hover { transform: translateY(-4px); }
+
+    .stat-num {
+      font-family: var(--font-serif);
+      font-size: 2.8rem;
+      background: linear-gradient(135deg, var(--red2), #ff7090);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+      margin-bottom: 0.4rem;
+    }
+
+    .stat-lbl {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    /* SKILLS */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .skill-card {
+      padding: 2.2rem 2rem;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .skill-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35), 0 0 30px rgba(222,28,69,0.12), inset 0 1px 0 rgba(255,255,255,0.55);
+    }
+
+    .skill-icon-wrap {
+      width: 52px; height: 52px;
+      background: rgba(222,28,69,0.15);
+      border: 1px solid rgba(222,28,69,0.3);
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      margin-bottom: 1.3rem;
+      box-shadow: 0 0 15px rgba(222,28,69,0.15);
+    }
+
+    .skill-name {
+      font-family: var(--font-serif);
+      font-size: 1.4rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .skill-desc {
+      font-size: 0.88rem;
+      font-weight: 300;
+      color: var(--text-dim);
+      line-height: 1.75;
+      margin-bottom: 1.5rem;
+    }
+
+    .skill-progress-wrap {
+      height: 4px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+
+    .skill-progress-bar {
+      height: 100%;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--red), var(--red2));
+      box-shadow: 0 0 10px rgba(222,28,69,0.5);
+      animation: grow 1.4s cubic-bezier(0.22,1,0.36,1) both;
+      transform-origin: left;
+    }
+
+    @keyframes grow { from{ transform:scaleX(0) } to{ transform:scaleX(1) } }
+
+    .skill-level-txt {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(222,28,69,0.75);
+    }
+
+    /* WORKS */
+    #works { background: rgba(0,0,0,0.15); }
+
+    .works-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .work-card {
+      padding: 0;
+      overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .work-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4), 0 0 40px rgba(222,28,69,0.12), inset 0 1px 0 rgba(255,255,255,0.55);
+    }
+
+    .work-thumb {
+      width: 100%;
+      aspect-ratio: 16/9;
+      background:
+        radial-gradient(ellipse at 30% 40%, rgba(222,28,69,0.2), transparent 60%),
+        rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 0.5rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .work-thumb-emoji { font-size: 3rem; opacity: 0.5; }
+
+    .work-thumb-tag {
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+    }
+
+    .work-info { padding: 1.8rem 2rem; }
+
+    .work-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--red2);
+      background: rgba(222,28,69,0.12);
+      border: 1px solid rgba(222,28,69,0.25);
+      border-radius: 30px;
+      padding: 0.28rem 0.75rem;
+      margin-bottom: 0.9rem;
+    }
+
+    .badge-dot {
+      width: 5px; height: 5px;
+      background: var(--red2);
+      border-radius: 50%;
+      animation: pulse-dot 2s infinite;
+    }
+
+    .work-name {
+      font-family: var(--font-serif);
+      font-size: 1.4rem;
+      margin-bottom: 0.6rem;
+    }
+
+    .work-desc {
+      font-size: 0.88rem;
+      font-weight: 300;
+      color: var(--text-dim);
+      line-height: 1.75;
+    }
+
+    /* CONTACT */
+    #contact {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .contact-glass {
+      max-width: 620px;
+      width: 100%;
+      padding: 4rem 3.5rem;
+      margin: 0 auto;
+    }
+
+    .contact-p {
+      font-size: 1rem;
+      font-weight: 300;
+      color: var(--text-dim);
+      line-height: 1.8;
+      margin-bottom: 2.5rem;
+    }
+
+    .contact-p strong { color: var(--text); font-weight: 500; }
+
+    .discord-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      font-family: var(--font);
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-decoration: none;
+      color: #fff;
+      background: linear-gradient(135deg, var(--red) 0%, #ff3b5c 100%);
+      padding: 1rem 2.2rem;
+      border-radius: 50px;
+      box-shadow: 0 6px 25px rgba(222,28,69,0.45), inset 0 1px 0 rgba(255,255,255,0.25);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .discord-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 35px rgba(222,28,69,0.6), inset 0 1px 0 rgba(255,255,255,0.25);
+    }
+
+    .discord-icon { width:22px; height:22px; fill:currentColor; flex-shrink:0; }
+
+    /* FOOTER */
+    footer {
+      padding: 1.5rem 6vw 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+
+    .footer-logo { font-family: var(--font-serif); font-size:1.1rem; color:var(--red2); }
+    .footer-copy { font-size:0.72rem; color:var(--text-dim); }
+
+    /* ANIMATIONS */
+    @keyframes fadeUp {
+      from { opacity:0; transform:translateY(24px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible { opacity:1; transform:translateY(0); }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) {
+      nav { top:12px; }
+      section { padding: 4rem 5vw; }
+      .about-grid, .skills-grid, .works-grid { grid-template-columns: 1fr; }
+      #hero { padding: 7rem 5vw 3rem; }
+    }
+
+    @media (max-width: 600px) {
+      .nav-links { display:none; }
+      .stats-grid { grid-template-columns:1fr 1fr; }
+      .contact-glass { padding: 2.5rem 1.8rem; }
+      footer { flex-direction:column; gap:0.7rem; text-align:center; }
+    }
+  </style>
+
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+</head>
+<body>
+
+  <div class="bg-canvas">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="page-wrap">
+
+    <!-- NAV -->
+    <nav>
+      <span class="nav-logo">STRAW</span>
+      <div class="nav-sep"></div>
+      <ul class="nav-links">
+        <li><a href="#about">À propos</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#works">Projets</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <!-- HERO -->
+    <section id="hero">
+      <div class="hero-inner">
+        <div class="hero-eyebrow">
+          <span class="eyebrow-dot"></span>
+          Modélisateur 3D · Garry's Mod
+        </div>
+        <h1 class="hero-title">
+          Je suis<br><span class="accent">STRAW.</span>
+        </h1>
+        <p class="hero-sub">
+          <strong>Modélisateur débutant</strong>, je crée et importe des modèles dans Garry's Mod — player models, rigs, et plus encore. Basé à Lille, 17 ans, passionné à fond.
+        </p>
+        <div class="hero-pills">
+          <span class="pill">🗺 Lille, France</span>
+          <span class="pill">🎮 Garry's Mod</span>
+          <span class="pill">🧊 Player Models</span>
+          <span class="pill">📐 17 ans</span>
+        </div>
+        <div class="hero-cta">
+          <a href="#works" class="btn-glass btn-primary">Voir mes projets →</a>
+          <a href="#contact" class="btn-glass btn-secondary">Me contacter</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section id="about">
+      <div class="about-grid">
+        <div class="glass about-card reveal">
+          <div class="section-label">Qui suis-je</div>
+          <h2 class="section-title" style="font-size:2.4rem;margin-bottom:1.8rem;">À propos<br><em>de moi</em></h2>
+          <div class="about-text">
+            <p>Je suis <strong>STRAW</strong>, 17 ans, basé à <strong>Lille</strong>. Passionné par la 3D et le modding, j'ai commencé à explorer la création de contenu pour <strong>Garry's Mod</strong>.</p>
+            <p>Mon truc ? Importer des modèles 3D dans GMod et les transformer en <strong>player models jouables</strong>, rigging, hitboxes, animations. Chaque projet m'apprend quelque chose de nouveau.</p>
+            <p>Encore débutant, mais motivé à progresser et à créer des modèles <strong>toujours plus travaillés</strong>.</p>
+          </div>
+        </div>
+        <div class="stats-grid reveal" style="align-content:start;">
+          <div class="glass stat-glass">
+            <div class="stat-num">17</div>
+            <div class="stat-lbl">Ans</div>
+          </div>
+          <div class="glass stat-glass">
+            <div class="stat-num">FR</div>
+            <div class="stat-lbl">Lille</div>
+          </div>
+          <div class="glass stat-glass">
+            <div class="stat-num">GMod</div>
+            <div class="stat-lbl">Plateforme</div>
+          </div>
+          <div class="glass stat-glass">
+            <div class="stat-num">∞</div>
+            <div class="stat-lbl">Motivation</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="skills">
+      <div style="max-width:1100px;margin:0 auto;">
+        <div class="section-label">Ce que je maîtrise</div>
+        <h2 class="section-title">Compétences</h2>
+        <div class="skills-grid">
+          <div class="glass skill-card reveal">
+            <div class="skill-icon-wrap">🎮</div>
+            <div class="skill-name">GMOD Modding</div>
+            <div class="skill-desc">Import et configuration d'addons dans Garry's Mod. Gestion des fichiers .mdl, materials, et publication Steam Workshop.</div>
+            <div class="skill-progress-wrap"><div class="skill-progress-bar" style="width:70%"></div></div>
+            <div class="skill-level-txt">Intermédiaire</div>
+          </div>
+          <div class="glass skill-card reveal">
+            <div class="skill-icon-wrap">🧍</div>
+            <div class="skill-name">Player Models</div>
+            <div class="skill-desc">Création et adaptation de player models : rigging des bones, setup des hitboxes, et intégration des animations.</div>
+            <div class="skill-progress-wrap"><div class="skill-progress-bar" style="width:55%"></div></div>
+            <div class="skill-level-txt">En progression</div>
+          </div>
+          <div class="glass skill-card reveal">
+            <div class="skill-icon-wrap">🗿</div>
+            <div class="skill-name">Modélisation 3D</div>
+            <div class="skill-desc">Travail sur la géométrie des meshes, UV mapping et textures. Apprentissage des bases de la topologie pour les personnages.</div>
+            <div class="skill-progress-wrap"><div class="skill-progress-bar" style="width:38%"></div></div>
+            <div class="skill-level-txt">Débutant</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- WORKS -->
+    <section id="works">
+      <div style="max-width:1100px;margin:0 auto;">
+        <div class="section-label">Réalisations</div>
+        <h2 class="section-title">Projets</h2>
+        <div class="works-grid">
+          <div class="glass work-card reveal">
+            <div class="work-thumb">
+              <div class="work-thumb-emoji">🧊</div>
+              <div class="work-thumb-tag">Player Model · GMod</div>
+            </div>
+            <div class="work-info">
+              <div class="work-badge"><span class="badge-dot"></span>En cours</div>
+              <div class="work-name">Premier Player Model</div>
+              <div class="work-desc">Mon tout premier player model configuré dans GMod. Mise en place du rigging, des hitboxes et des animations de base pour un rendu in-game fluide.</div>
+            </div>
+          </div>
+          <div class="glass work-card reveal">
+            <div class="work-thumb">
+              <div class="work-thumb-emoji">⚙️</div>
+              <div class="work-thumb-tag">Import 3D · GMod</div>
+            </div>
+            <div class="work-info">
+              <div class="work-badge"><span class="badge-dot"></span>En cours</div>
+              <div class="work-name">Pipeline d'Import</div>
+              <div class="work-desc">Exploration du workflow complet d'import de modèles tiers dans GMod : conversion de formats, textures, materials et compilation.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section id="contact">
+      <div class="glass contact-glass reveal">
+        <div class="section-label" style="display:flex;justify-content:center;">Restons en contact</div>
+        <h2 class="section-title" style="text-align:center;">Me retrouver<br><em>sur Discord</em></h2>
+        <p class="contact-p">
+          Tu veux collaborer, partager des modèles ou juste discuter modding ?<br>
+          <strong>Discord est l'endroit où je suis le plus actif.</strong>
+        </p>
+        <a href="https://discord.gg/b6Fbqcxa7W" target="_blank" class="discord-btn">
+          <svg class="discord-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20.317 4.492c-1.53-.69-3.17-1.2-4.885-1.49a.075.075 0 0 0-.079.036c-.21.369-.444.85-.608 1.23a18.566 18.566 0 0 0-5.487 0 12.36 12.36 0 0 0-.617-1.23A.077.077 0 0 0 8.562 3c-1.714.29-3.354.8-4.885 1.491a.07.07 0 0 0-.032.027C.533 9.093-.32 13.555.099 17.961a.08.08 0 0 0 .031.055 20.03 20.03 0 0 0 5.993 2.98.078.078 0 0 0 .084-.026 13.83 13.83 0 0 0 1.226-1.963.074.074 0 0 0-.041-.104 13.201 13.201 0 0 1-1.872-.878.075.075 0 0 1-.008-.125c.126-.093.252-.19.372-.287a.075.075 0 0 1 .078-.01c3.927 1.764 8.18 1.764 12.061 0a.075.075 0 0 1 .079.009c.12.098.245.195.372.288a.075.075 0 0 1-.006.125c-.598.344-1.22.635-1.873.877a.075.075 0 0 0-.041.105c.36.687.772 1.341 1.225 1.962a.077.077 0 0 0 .084.028 19.963 19.963 0 0 0 6.002-2.981.076.076 0 0 0 .032-.054c.5-5.094-.838-9.52-3.549-13.442a.06.06 0 0 0-.031-.028zM8.02 15.278c-1.182 0-2.157-1.069-2.157-2.38 0-1.312.956-2.38 2.157-2.38 1.21 0 2.176 1.077 2.157 2.38 0 1.312-.956 2.38-2.157 2.38zm7.975 0c-1.183 0-2.157-1.069-2.157-2.38 0-1.312.955-2.38 2.157-2.38 1.21 0 2.176 1.077 2.157 2.38 0 1.312-.946 2.38-2.157 2.38z"/>
+          </svg>
+          Contacter sur Discord
+        </a>
+      </div>
+    </section>
+
+    <footer>
+      <div class="footer-logo">STRAW</div>
+      <div class="footer-copy">© 2025 STRAW · Lille, France · Modélisateur 3D</div>
+    </footer>
+
+  </div>
+
+  <script>
+    const reveals = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e, i) => {
+        if (e.isIntersecting) {
+          setTimeout(() => e.target.classList.add('visible'), i * 90);
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.08 });
+    reveals.forEach(el => io.observe(el));
+
+    const sections = document.querySelectorAll('section[id]');
+    const links = document.querySelectorAll('.nav-links a');
+    window.addEventListener('scroll', () => {
+      let cur = '';
+      sections.forEach(s => { if (window.scrollY >= s.offsetTop - 140) cur = s.id; });
+      links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#' + cur));
+    }, { passive: true });
+  </script>
+</body>
+</html>
